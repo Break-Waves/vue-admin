@@ -28,16 +28,20 @@
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作" align="center">
-        <el-button
+        <template v-slot="{row,$index}">
+          <el-button
           type="warning"
           icon="el-icon-edit"
           size="mini"
-          @click="updateTrademark"
+          @click="updateTrademark(row)"
           >修改</el-button
         >
         <el-button type="danger" icon="el-icon-delete" size="mini"
           >删除</el-button
         >
+            
+          
+        </template>
       </el-table-column>
     </el-table>
 
@@ -72,7 +76,7 @@
 
     <!-- :visible.sync---设置对话框显示与隐藏用的 -->
 
-    <el-dialog title="添加品牌" :visible.sync="dialogFormVisible">
+    <el-dialog :title="tmForm.id?'修改品牌':'添加品牌'" :visible.sync="dialogFormVisible">
       <!-- form表单
 
           model	表单数据对象
@@ -131,7 +135,7 @@ export default {
     };
   },
   mounted() {
-    this.getBrandList({ page: "1", limit: "4" });
+    this.getBrandList({ page: "1", limit: "6" });
   },
   methods: {
     ...mapActions("product", ["getBrandList","addOrUpdateBanner"]),
@@ -140,6 +144,7 @@ export default {
       this.current = pager;
       this.getBrandList({ page: this.current, limit: "6" });
     },
+    //点击添加弹出对话框
     showDialog() {
       this.dialogFormVisible = true;
       //清空tmForm数据，避免下次点击添加时残留上次的添加品牌信息
@@ -148,13 +153,15 @@ export default {
         logoUrl:''
       }
     },
-    updateTrademark() {
+    updateTrademark(row) {
       this.dialogFormVisible = true;
+      this.tmForm = {...row}
+
     },
     //上传图片成功
     handleAvatarSuccess(res, file) {
       //上传成功后服务器返回前端数据
-      // console.log(res,file);
+      console.log(res,file);
       //收集品牌图片数据，将来需要带给服务器
       this.tmForm.logoUrl = res.data
     },
@@ -172,8 +179,10 @@ export default {
     },
     addOrUpdate(){
       this.dialogFormVisible = false
+      console.log(this.tmForm);
       this.addOrUpdateBanner(this.tmForm)
-      this.getBrandList({ page: "1", limit: "4" })
+      //如果是在修改，则不跳转至第一页，而是修改项所在的那一页
+      this.getBrandList({ page: this.tmForm.id?this.current:"1", limit: "4" })
       this.$message(this.tmForm.id?'修改品牌成功':'添加品牌成功');
     }
   },

@@ -12,7 +12,7 @@ export const reqBrandList = (page,limit) => {
 export const reqAddOrUpdateBanner = (trademark)=>{
     if(trademark.id){
         return request({
-            url:'/admin/product/baseTrademark/save',
+            url:'/admin/product/baseTrademark/update',
             method:'put',
             data:trademark
         })
